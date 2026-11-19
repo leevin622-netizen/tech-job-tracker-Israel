@@ -30,7 +30,8 @@ header{background:var(--surface);border-bottom:1px solid var(--border);position:
 .logo{font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px}
 .logo span{background:var(--accent);color:#fff;border-radius:8px;padding:2px 8px;font-size:13px}
 .sp{flex:1}
-nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px}
+nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
 nav button{background:none;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:500;white-space:nowrap;position:relative}
 nav button.on{background:var(--accent-soft);color:var(--accent)}
 nav button .dot{background:var(--bad);color:#fff;border-radius:999px;font-size:11px;padding:0 6px;margin-inline-start:4px}
@@ -57,7 +58,7 @@ label.ck{font-size:13px;display:flex;gap:4px;align-items:center;white-space:nowr
 .chip i{font-style:normal;opacity:.7;margin-inline-start:4px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
 @media (max-width:420px){.grid{grid-template-columns:1fr}}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;position:relative}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;position:relative;content-visibility:auto;contain-intrinsic-size:auto 230px}
 .card.noise{opacity:.6;border-style:dashed}
 .card.unseen{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .card h3{margin:0;font-size:16px;line-height:1.35;text-align:start;word-break:break-word;cursor:pointer}
@@ -86,10 +87,6 @@ label.ck{font-size:13px;display:flex;gap:4px;align-items:center;white-space:nowr
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
 .panel h3{margin:0 0 12px;font-size:17px}
 .panel p.hint{color:var(--muted);font-size:13px;margin:-6px 0 12px}
-.bars{display:flex;flex-direction:column;gap:6px}
-.bar{display:grid;grid-template-columns:130px 1fr 34px;gap:8px;align-items:center;font-size:13px}
-.bar div{height:14px;background:var(--accent);border-radius:4px;min-width:2px}
-.bar span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media (max-width:800px){.two{grid-template-columns:1fr}}
 table{width:100%;border-collapse:collapse;font-size:14px}
@@ -123,6 +120,98 @@ th{color:var(--muted);font-weight:500}
 .hide{display:none!important}
 kbd{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0 5px;font-size:12px}
 .prio{cursor:pointer;letter-spacing:-2px;font-size:14px}
+@media (max-width:640px){
+  .hrow{gap:6px;padding:8px 0}
+  .logo{font-size:17px}
+  .logo span{font-size:11px}
+  #lastUpdate,.hrow .bl{display:none}
+  .hrow .btn{padding:6px 9px}
+  nav button{padding:7px 10px}
+  .kpi{padding:12px}
+  .kpi .k-v{font-size:24px}
+  .hb{grid-template-columns:minmax(60px,96px) 1fr minmax(40px,auto);gap:8px}
+}
+/* ---------- charts ---------- */
+.statbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.statbar .hint{color:var(--muted);font-size:13px}
+.seg{display:inline-flex;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:none;padding:6px 14px;border-radius:7px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:background .15s,color .15s}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .k-l{color:var(--muted);font-size:13px}
+.kpi .k-v{font-size:30px;font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.kpi .k-v small{font-size:15px;font-weight:500;color:var(--muted);margin-inline-start:3px}
+.kpi .k-d{font-size:12px;color:var(--muted);min-height:18px}
+.kpi .k-d b{color:var(--text);font-weight:600}
+.kpi svg{display:block;margin-top:6px}
+.ph{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.ph h3{margin:0 0 4px}
+.ph .hint{margin:0 0 12px}
+.chart{width:100%;position:relative;user-select:none;-webkit-user-select:none}
+.chart svg{display:block;overflow:visible;touch-action:pan-y;direction:ltr}
+.chart .grid{stroke:var(--border);stroke-width:1;shape-rendering:crispEdges}
+.chart .base{stroke:var(--muted);stroke-width:1;opacity:.5;shape-rendering:crispEdges}
+.chart .ax{fill:var(--muted);font-size:11px;font-family:Heebo,system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.chart .ln{fill:none;stroke:var(--accent);stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round}
+.chart .ar{stroke:none}
+.chart .xh{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;opacity:0;transition:opacity .12s}
+.chart .dot{fill:var(--accent);stroke:var(--surface);stroke-width:2.5;opacity:0;transition:opacity .12s}
+.chart.hov .xh,.chart.hov .dot{opacity:1}
+.chart .cb{fill:var(--accent);transition:opacity .15s}
+.chart .cb.cur{fill:var(--accent)}
+.chart .cb.past{opacity:.72}
+.chart.hov .cb{opacity:.35}.chart.hov .cb.hi{opacity:1}
+.chart .goal{stroke:var(--text);stroke-width:1.25;stroke-dasharray:5 4;opacity:.55}
+.chart .gl{fill:var(--muted);font-size:11px;font-family:Heebo,system-ui,sans-serif}
+.chart .vl{fill:var(--text);font-size:12px;font-weight:700;font-family:Heebo,system-ui,sans-serif}
+#tip{position:fixed;z-index:80;pointer-events:none;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 11px;font-size:13px;line-height:1.45;box-shadow:0 6px 24px rgba(0,0,0,.18);opacity:0;transform:translateY(3px);transition:opacity .1s,transform .1s;max-width:260px}
+#tip.on{opacity:1;transform:none}
+#tip b{font-size:15px}
+#tip .t-h{color:var(--muted);font-size:12px}
+.hbl{display:flex;flex-direction:column;gap:2px}
+.hb{display:grid;grid-template-columns:minmax(70px,130px) 1fr minmax(44px,auto);gap:10px;align-items:center;font-size:13px;padding:5px 6px;border-radius:8px;transition:background .12s}
+.hb.click{cursor:pointer}
+.hb.click:hover,.hb.click:focus-visible{background:var(--surface2);outline:none}
+.hb .lb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb .tr{height:12px;position:relative}
+.hb .fl{position:absolute;inset-block:0;inset-inline-start:0;background:var(--accent);border-start-end-radius:4px;border-end-end-radius:4px;min-width:3px;transform-origin:right center}
+[dir=rtl] .hb .fl{transform-origin:right center}
+.hb .vl{color:var(--muted);font-variant-numeric:tabular-nums;text-align:end;white-space:nowrap}
+.hb .vl b{color:var(--text);font-weight:600}
+.hb .sub{grid-column:2/4;font-size:12px;color:var(--muted);margin-top:-4px}
+.fun .hb{grid-template-columns:minmax(70px,110px) 1fr minmax(44px,auto)}
+.fun .cv{font-size:12px;color:var(--muted);padding-inline-start:6px;margin:-1px 0 1px}
+.heatw{display:flex;gap:6px;direction:ltr;padding-bottom:4px;max-width:520px}
+.heatd{display:grid;grid-template-rows:repeat(7,1fr);gap:3px;font-size:10px;color:var(--muted);text-align:right;align-items:center}
+.heat{flex:1;display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,auto);grid-auto-columns:1fr;gap:3px}
+.heat i{aspect-ratio:1;border-radius:3px;background:var(--surface2);outline:1px solid color-mix(in srgb,var(--border) 60%,transparent);outline-offset:-1px}
+.heat i.l1{background:color-mix(in srgb,var(--accent) 30%,var(--surface))}
+.heat i.l2{background:color-mix(in srgb,var(--accent) 55%,var(--surface))}
+.heat i.l3{background:color-mix(in srgb,var(--accent) 78%,var(--surface))}
+.heat i.l4{background:var(--accent)}
+.heat i.fut{visibility:hidden}
+.heat i:hover{outline:2px solid var(--text);outline-offset:0}
+.heatlg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.heatlg i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.tblv{margin-top:10px;font-size:13px}
+.tblv summary{cursor:pointer;color:var(--muted)}
+.tblv table{margin-top:6px}
+.tblv td,.tblv th{padding:4px 8px}
+.nodata{color:var(--muted);font-size:14px;padding:18px 4px;text-align:center}
+/* entry animations: cheap (transform/opacity only), first render of the tab only */
+.anim .hb .fl{animation:growx .5s cubic-bezier(.2,.7,.2,1) both}
+.anim .chart .cb{animation:growy .5s cubic-bezier(.2,.7,.2,1) both;transform-box:fill-box;transform-origin:center bottom}
+.anim .chart .ln{stroke-dasharray:1;animation:draw .7s ease-out both}
+.anim .chart .ar{animation:fade .7s ease-out both}
+.anim .kpi{animation:rise .35s ease-out both}
+.anim .heat i{animation:fade .4s ease-out both}
+@keyframes growx{from{transform:scaleX(0)}}
+@keyframes growy{from{transform:scaleY(0)}}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes fade{from{opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){.anim *{animation:none!important}}
 </style>
 </head>
 <body>
@@ -132,9 +221,9 @@ kbd{background:var(--surface2);border:1px solid var(--border);border-radius:4px;
       <div class="logo">🇮🇱 מנהל חיפוש עבודה <span id="yoeBadge" title="שינוי בלשונית הפרופיל"></span></div>
       <div class="sp"></div>
       <span id="lastUpdate" style="color:var(--muted);font-size:13px"></span>
-      <button class="btn" id="addBtn" title="הוספת משרה שמצאת במקום אחר">➕ משרה</button>
-      <button class="btn" id="refBtn">👥 רפרלים</button>
-      <button class="btn" id="dataBtn">💾 גיבוי</button>
+      <button class="btn" id="addBtn" title="הוספת משרה שמצאת במקום אחר">➕<span class="bl"> משרה</span></button>
+      <button class="btn" id="refBtn" title="רפרלים">👥<span class="bl"> רפרלים</span></button>
+      <button class="btn" id="dataBtn" title="גיבוי ושחזור">💾<span class="bl"> גיבוי</span></button>
       <button class="btn" id="themeBtn" title="מצב תצוגה">🌓</button>
     </div>
     <nav id="nav">
@@ -206,14 +295,52 @@ kbd{background:var(--surface2);border:1px solid var(--border);border-radius:4px;
 
   <!-- STATS -->
   <section id="v-stats" class="hide">
-    <div class="stats" id="stats2"></div>
+    <div class="statbar">
+      <div class="seg" id="rangeSeg" role="tablist" aria-label="טווח זמן">
+        <button data-r="7">7 ימים</button><button data-r="30" class="on">30 יום</button><button data-r="90">90 יום</button><button data-r="0">הכל</button>
+      </div>
+      <span class="hint" id="statScope"></span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="panel">
+      <div class="ph"><div><h3>משרות חדשות לאורך זמן</h3><p class="hint">כמה משרות רלוונטיות אליך נמצאו בכל יום. רחף/י מעל הגרף לפרטים.</p></div></div>
+      <div class="chart" id="chLine"></div>
+      <details class="tblv"><summary>הצג כטבלה</summary><div id="tblLine"></div></details>
+    </div>
     <div class="two">
-      <div class="panel"><h3>משפך ההגשות שלי</h3><div class="bars" id="barFunnel"></div><p class="hint" id="rates" style="margin:10px 0 0"></p></div>
-      <div class="panel"><h3>הגשות לפי שבוע</h3><div class="bars" id="barWeeks"></div></div>
-      <div class="panel"><h3>משרות לפי תחום</h3><div class="bars" id="barRole"></div></div>
-      <div class="panel"><h3>חברות מובילות</h3><div class="bars" id="barCompany"></div></div>
-      <div class="panel"><h3>משרות לפי מיקום</h3><div class="bars" id="barCity"></div></div>
-      <div class="panel"><h3>משרות חדשות לפי יום (14 יום)</h3><div class="bars" id="barDay"></div></div>
+      <div class="panel">
+        <div class="ph"><div><h3>משפך ההגשות</h3><p class="hint">כמה משרות הגיעו לכל שלב, ואחוז המעבר מהשלב הקודם</p></div></div>
+        <div id="chFunnel"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>הגשות בשבוע מול היעד</h3><p class="hint">8 השבועות האחרונים · הקו המקווקו הוא היעד השבועי</p></div></div>
+        <div class="chart" id="chWeeks"></div>
+        <details class="tblv"><summary>הצג כטבלה</summary><div id="tblWeeks"></div></details>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>ימי פעילות</h3><p class="hint">כל ריבוע הוא יום. ככל שהוא כהה יותר, עדכנת יותר משרות באותו יום</p></div></div>
+        <div id="chHeat"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>אילו ערוצים עובדים</h3><p class="hint">הגשות לפי מקור, וכמה מהן הגיעו לראיון. את המקור מגדירים בפרטי המשרה.</p></div></div>
+        <div id="chSrc"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>משרות לפי תחום</h3><p class="hint">לחיצה על שורה מציגה את המשרות</p></div></div>
+        <div id="chRole"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>משרות לפי אזור</h3><p class="hint">לחיצה על שורה מציגה את המשרות</p></div></div>
+        <div id="chRegion"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>חברות עם הכי הרבה משרות</h3><p class="hint">לחיצה על שורה מציגה את המשרות</p></div></div>
+        <div id="chCompany"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>משרות לפי רמת ניסיון</h3><p class="hint">לפי מה שזוהה בכותרת המשרה או על ידי הסורק</p></div></div>
+        <div id="chLevel"></div>
+      </div>
     </div>
   </section>
 
@@ -390,13 +517,15 @@ function cleanTitle(t){
   t=t.replace(/([a-z\)])([A-Z][a-z]+(?: [A-Z][a-z]+)?, (?:Israel|Thailand|IL))/g,'$1 · $2');
   return t.replace(/\s+/g,' ').trim();
 }
+// only http(s) links are ever rendered (scraped data could contain javascript: URLs)
+const safeUrl=u=>{u=String(u||'').trim();return/^https?:\/\//i.test(u)?u:''};
 function hash(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return 'j'+(h>>>0).toString(36)}
 function dedupKey(j){return(j.company+'|'+j.title).toLowerCase().replace(/[^a-z0-9֐-׿]/g,'')}
 const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 function wordRe(w){return new RegExp('(^|[^a-z0-9א-ת])'+reEsc(w.toLowerCase())+'($|[^a-z0-9א-ת])','i')}
 
 function enrichOne(r,custom){
-  const title=cleanTitle(r.title),j={...r,title,custom:!!custom};
+  const title=cleanTitle(r.title),j={...r,title,custom:!!custom,url:safeUrl(r.url)};
   const text=title+' '+(r.url||'')+' '+(r.location&&!/^israel$/i.test(r.location)?r.location:'');
   j.id=r.id||hash(r.url||dedupKey(j));
   j.roles=ROLES.filter(([,re])=>re.test(text)).map(([n])=>n);
@@ -415,7 +544,16 @@ function enrichOne(r,custom){
 }
 function enrich(raw){
   const seen=new Map();
-  for(const r of raw){const j=enrichOne(r,false);const k=dedupKey(j);if(!seen.has(k))seen.set(k,j)}
+  const byUrl=new Map(),ids=new Set();
+  const norm=t=>t.toLowerCase().replace(/ · .*$/,'').replace(/[^a-z0-9֐-׿]/g,'');
+  for(const r of raw){const j=enrichOne(r,false);const k=dedupKey(j);if(seen.has(k))continue;
+    const same=(byUrl.get(j.url)||[]);
+    // same link + same title (one with a city suffix, one without) = the same job listed twice
+    const twin=same.find(o=>{const a=norm(o.title),b=norm(j.title);return a&&b&&(a.startsWith(b)||b.startsWith(a))});
+    if(twin){if(twin.city==='לא צוין'&&j.city!=='לא צוין'){twin.city=j.city;twin.region=j.region}continue}
+    // one link shared by different jobs (e.g. a single application form): give each its own id
+    if(ids.has(j.id))j.id=hash((j.url||'')+'|'+j.title);
+    ids.add(j.id);same.push(j);if(j.url)byUrl.set(j.url,same);seen.set(k,j)}
   for(const r of st.custom)seen.set('c'+r.id,enrichOne(r,true));
   return[...seen.values()];
 }
@@ -466,8 +604,10 @@ const isUnseen=j=>prevVisit&&j.date>prevVisit&&stOf(j)==='new';
 function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function addDays(ds,n){const d=new Date(ds+'T00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function daysTo(ds){return Math.round((new Date(ds+'T00:00')-new Date(today()+'T00:00'))/DAY)}
-function fmtDay(ds){return new Date(ds+'T00:00').toLocaleDateString('he-IL',{weekday:'short',day:'numeric',month:'numeric'})}
-function fmtDate(d){return new Date(d).toLocaleString('he-IL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+const DF={day:new Intl.DateTimeFormat('he-IL',{weekday:'short',day:'numeric',month:'numeric'}),dt:new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),
+  s:new Intl.DateTimeFormat('he-IL',{day:'numeric',month:'numeric'}),l:new Intl.DateTimeFormat('he-IL',{weekday:'long',day:'numeric',month:'long'})};
+function fmtDay(ds){return DF.day.format(new Date(ds+'T00:00'))}
+function fmtDate(d){return DF.dt.format(new Date(d))}
 function ago(d){const h=(Date.now()-d)/36e5;if(h<1)return'לפני פחות משעה';if(h<24)return`לפני ${Math.floor(h)} שעות`;const dd=Math.floor(h/24);return dd===1?'אתמול':`לפני ${dd} ימים`}
 function relDay(ds){const n=daysTo(ds);return n===0?'היום':n===1?'מחר':n===-1?'אתמול':n<0?`לפני ${-n} ימים`:`בעוד ${n} ימים`}
 
@@ -685,24 +825,195 @@ function renderTasks(){
 function updateTaskDot(){const n=tasks().filter(x=>daysTo(x.date)<=0).length;const d=$('#taskDot');d.textContent=n;d.classList.toggle('hide',!n)}
 
 /* ---------- STATS ---------- */
-function bars(el,pairs,max){max=max||Math.max(1,...pairs.map(p=>p[1]));$(el).innerHTML=pairs.map(([l,n])=>`<div class="bar"><span title="${esc(l)}">${esc(l)}</span><div style="width:${n/max*100}%"></div><span>${n}</span></div>`).join('')||'<small>אין נתונים</small>'}
 function count(arr){const m={};arr.forEach(x=>m[x]=(m[x]||0)+1);return Object.entries(m).sort((a,b)=>b[1]-a[1])}
-function renderStatsView(){
-  renderStats('#stats2');const clean=jobs.filter(j=>!j.noise);
-  bars('#barRole',count(clean.flatMap(j=>j.roles.length?j.roles:['אחר'])));
-  bars('#barCompany',count(clean.map(j=>j.company)).slice(0,12));
-  bars('#barCity',count(clean.map(j=>j.city)).slice(0,10));
-  const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);const e=+d+DAY;days.push([d.toLocaleDateString('he-IL',{weekday:'short',day:'numeric',month:'numeric'}),clean.filter(j=>j.date>=d&&j.date<e).length])}
-  bars('#barDay',days);
-  const ever=s=>Object.values(st.jobs).filter(o=>(o.h||[]).some(([x])=>x===s)||o.s===s).length;
-  const ap=ever('applied'),iv=ever('interview'),of=ever('offer');
-  bars('#barFunnel',[['שמרתי',ever('saved')],['הגשתי',ap],['ראיון',iv],['הצעה',of],['נדחה',ever('rejected')]]);
-  $('#rates').textContent=ap?`שיעור מעבר לראיון: ${Math.round(iv/ap*100)}% · שיעור הצעות מתוך ראיונות: ${iv?Math.round(of/iv*100):0}%`:'עוד אין הגשות למדידה';
-  const at=appliedTimes(),ws=weekStart(),wk=[];for(let i=7;i>=0;i--){const s=ws-i*7*DAY,e=s+7*DAY;wk.push([i?`לפני ${i} שבועות`:'השבוע',at.filter(t=>t>=s&&t<e).length])}
-  bars('#barWeeks',wk,Math.max(st.profile.goal,...wk.map(w=>w[1])));
+let statRange=30;
+const SVGNS='http://www.w3.org/2000/svg';
+const tip=document.createElement('div');tip.id='tip';tip.setAttribute('role','tooltip');document.body.appendChild(tip);
+function showTip(e,html){
+  tip.innerHTML=html;tip.classList.add('on');
+  const w=tip.offsetWidth,h=tip.offsetHeight;let x=e.clientX+14,y=e.clientY-h-12;
+  if(x+w>innerWidth-8)x=e.clientX-w-14;if(y<8)y=e.clientY+16;
+  tip.style.left=Math.max(8,x)+'px';tip.style.top=Math.max(8,y)+'px';
+}
+function hideTip(){tip.classList.remove('on')}
+addEventListener('scroll',()=>{if(tip.classList.contains('on')){hideTip();document.querySelectorAll('.chart.hov').forEach(c=>c.classList.remove('hov'))}},{passive:true});
+const dayStart=t=>{const d=new Date(t);d.setHours(0,0,0,0);return+d};
+function lastDays(n){const out=[],d=new Date();d.setHours(0,0,0,0);for(let i=n-1;i>=0;i--){const x=new Date(d);x.setDate(d.getDate()-i);out.push(+x)}return out}
+const fmtShort=t=>DF.s.format(t);
+const fmtLong=t=>DF.l.format(t);
+function niceMax(v){if(v<=5)return Math.max(1,Math.ceil(v));const p=10**Math.floor(Math.log10(v)),m=v/p;const step=[1,1.2,1.6,2,3,4,5,6,8,10].find(x=>x>=m-1e-9);let r=Math.round(step*p);if(r%2)r+=1;return r}
+function yTicks(max){if(max<=5){const t=[];for(let i=0;i<=max;i++)t.push(i);return t}return[0,max/2,max]}
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+// Hebrew count phrase: 1 → 'משרה אחת', n → 'n משרות'
+const cnt=(n,one,many)=>n===1?one:`<b>${n}</b> ${many}`;
+
+// Monotone cubic interpolation (Fritsch–Carlson): smooth line that never overshoots the data
+function smoothPath(P){
+  const n=P.length;if(n<2)return n?`M${P[0][0]},${P[0][1]}`:'';if(n===2)return`M${P[0][0]},${P[0][1]}L${P[1][0]},${P[1][1]}`;
+  const dx=[],dy=[],s=[],m=[];
+  for(let i=0;i<n-1;i++){dx[i]=P[i+1][0]-P[i][0];dy[i]=P[i+1][1]-P[i][1];s[i]=dy[i]/dx[i]}
+  m[0]=s[0];m[n-1]=s[n-2];
+  for(let i=1;i<n-1;i++)m[i]=s[i-1]*s[i]<=0?0:3*(dx[i-1]+dx[i])/((2*dx[i]+dx[i-1])/s[i-1]+(dx[i]+2*dx[i-1])/s[i]);
+  let d=`M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}`;
+  for(let i=0;i<n-1;i++){const h=dx[i]/3;d+=`C${(P[i][0]+h).toFixed(1)},${(P[i][1]+m[i]*h).toFixed(1)} ${(P[i+1][0]-h).toFixed(1)},${(P[i+1][1]-m[i+1]*h).toFixed(1)} ${P[i+1][0].toFixed(1)},${P[i+1][1].toFixed(1)}`}
+  return d;
+}
+function colPath(x,y,w,h){if(h<=0)return'';const r=Math.min(4,w/2,h);return`M${x},${y+h}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h}Z`}
+
+// Area/line chart with crosshair tooltip. pts: [[timestamp,value]]
+function lineChart(id,pts,tipText,w){
+  const box=$(id),W=Math.max(280,w),H=W<520?190:230,m={l:30,r:16,t:14,b:26},iw=W-m.l-m.r,ih=H-m.t-m.b,n=pts.length;
+  const max=niceMax(Math.max(1,...pts.map(p=>p[1])));
+  const X=i=>m.l+(n<2?iw/2:i*iw/(n-1)),Y=v=>m.t+ih-v/max*ih;
+  const P=pts.map((p,i)=>[X(i),Y(p[1])]),line=smoothPath(P);
+  const every=Math.max(1,Math.ceil(n/(W<520?4:7)));
+  const gid='g'+id.slice(1);
+  let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="גרף לפי יום"><defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--accent);stop-opacity:.32"/><stop offset="1" style="stop-color:var(--accent);stop-opacity:0"/></linearGradient></defs>`;
+  for(const t of yTicks(max))s+=`<line class="${t?'grid':'base'}" x1="${m.l}" x2="${W-m.r}" y1="${Y(t)}" y2="${Y(t)}"/><text class="ax" x="${m.l-8}" y="${Y(t)+4}" text-anchor="end">${t}</text>`;
+  pts.forEach((p,i)=>{if((n-1-i)%every===0)s+=`<text class="ax" x="${X(i)}" y="${H-7}" text-anchor="${i===n-1?'end':i===0?'start':'middle'}">${fmtShort(p[0])}</text>`});
+  if(n>1)s+=`<path class="ar" fill="url(#${gid})" d="${line}L${X(n-1)},${m.t+ih}L${X(0)},${m.t+ih}Z"/>`;
+  s+=`<path class="ln" pathLength="1" d="${line}"/><line class="xh" y1="${m.t}" y2="${m.t+ih}"/><circle class="dot" r="5"/><rect x="${m.l}" y="0" width="${iw}" height="${H}" fill="transparent"/></svg>`;
+  box.innerHTML=s;
+  const svg=box.firstChild,xh=svg.querySelector('.xh'),dot=svg.querySelector('.dot');
+  const move=e=>{const r=svg.getBoundingClientRect(),i=Math.max(0,Math.min(n-1,Math.round((e.clientX-r.left-m.l)/iw*(n-1))));
+    xh.setAttribute('x1',X(i));xh.setAttribute('x2',X(i));dot.setAttribute('cx',X(i));dot.setAttribute('cy',Y(pts[i][1]));box.classList.add('hov');
+    showTip(e,`<div class="t-h">${fmtLong(pts[i][0])}</div>${tipText(pts[i][1])}`)};
+  svg.onpointermove=move;svg.onpointerdown=move;svg.onpointerleave=()=>{box.classList.remove('hov');hideTip()};
 }
 
+// Column chart with an optional dashed goal line (same axis). cols: [{label,value,tip,current}]
+function colChart(id,cols,goal,w){
+  const box=$(id),W=Math.max(280,w),H=W<520?190:220,m={l:30,r:12,t:22,b:26},iw=W-m.l-m.r,ih=H-m.t-m.b,n=cols.length;
+  const max=niceMax(Math.max(1,goal||0,...cols.map(c=>c.value)));const Y=v=>m.t+ih-v/max*ih,band=iw/n,bw=Math.min(34,band*.62);
+  let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="עמודות">`;
+  for(const t of yTicks(max))s+=`<line class="${t?'grid':'base'}" x1="${m.l}" x2="${W-m.r}" y1="${Y(t)}" y2="${Y(t)}"/><text class="ax" x="${m.l-8}" y="${Y(t)+4}" text-anchor="end">${t}</text>`;
+  cols.forEach((c,i)=>{const x=m.l+i*band+(band-bw)/2,y=Y(c.value);
+    s+=`<path class="cb ${c.current?'cur':'past'}" data-i="${i}" style="animation-delay:${i*40}ms" d="${colPath(x,y,bw,m.t+ih-y)}"/>`;
+    if(c.current||i===n-1)s+=`<text class="vl" x="${x+bw/2}" y="${y-6}" text-anchor="middle">${c.value}</text>`;
+    s+=`<text class="ax" x="${x+bw/2}" y="${H-7}" text-anchor="middle">${c.label}</text>`});
+  if(goal){const gy=Y(goal);s+=`<line class="goal" x1="${m.l}" x2="${W-m.r}" y1="${gy}" y2="${gy}"/><text class="gl" x="${W-m.r}" y="${gy-5}" text-anchor="end">יעד ${goal}</text>`}
+  cols.forEach((c,i)=>s+=`<rect data-i="${i}" x="${m.l+i*band}" y="${m.t}" width="${band}" height="${ih}" fill="transparent"/>`);
+  box.innerHTML=s+'</svg>';
+  const svg=box.firstChild,bars=svg.querySelectorAll('.cb');
+  svg.onpointermove=e=>{const i=e.target.dataset&&e.target.dataset.i;if(i==null)return;bars.forEach(b=>b.classList.toggle('hi',b.dataset.i===i));box.classList.add('hov');showTip(e,cols[+i].tip)};
+  svg.onpointerleave=()=>{box.classList.remove('hov');bars.forEach(b=>b.classList.remove('hi'));hideTip()};
+}
+
+// Horizontal bar list (HTML, RTL-native). rows: [{label,value,sub,tip,go}]
+function hbars(id,rows,opts={}){
+  const box=$(id);if(!rows.length){box.innerHTML=`<div class="nodata">${opts.empty||'אין עדיין נתונים'}</div>`;return}
+  const max=opts.max||Math.max(1,...rows.map(r=>r.value));
+  box.innerHTML=`<div class="hbl">${rows.map((r,i)=>`<div class="hb ${r.go?'click':''}" data-i="${i}" ${r.go?'tabindex="0" role="button"':''}>
+    <span class="lb" title="${esc(r.label)}">${esc(r.label)}</span><span class="tr"><span class="fl" style="width:${Math.max(r.value?1.5:0,r.value/max*100)}%;animation-delay:${i*35}ms"></span></span>
+    <span class="vl">${r.valueText||`<b>${r.value}</b>`}</span>${r.sub?`<span class="sub">${r.sub}</span>`:''}</div>`).join('')}</div>`;
+  const row=e=>{const h=e.target.closest('.hb');return h?rows[+h.dataset.i]:null};
+  box.onpointermove=e=>{const r=row(e);r&&r.tip?showTip(e,r.tip+(r.go?'<div class="t-h">לחיצה להצגת המשרות</div>':'')):hideTip()};
+  box.onpointerleave=hideTip;
+  box.onclick=e=>{const r=row(e);if(r&&r.go){hideTip();r.go()}};
+  box.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){const r=row(e);if(r&&r.go){e.preventDefault();r.go()}}};
+}
+function sparkline(raw){
+  // bin daily values into ~14 buckets so sparse 0/1 days read as a trend, not a zig-zag
+  const bs=Math.max(1,Math.ceil(raw.length/14)),vals=[];for(let i=raw.length;i>0;i-=bs)vals.unshift(raw.slice(Math.max(0,i-bs),i).reduce((a,b)=>a+b,0));
+  const W=150,H=28,n=vals.length;if(n<2)return'';const max=Math.max(1,...vals);
+  const P=vals.map((v,i)=>[i*(W-4)/(n-1)+2,H-3-v/max*(H-6)]);
+  return`<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${smoothPath(P)}" fill="none" stroke="var(--accent)" stroke-width="1.75" vector-effect="non-scaling-stroke" stroke-linecap="round"/></svg>`;
+}
+// tables are built only when their <details> is opened
+function lazyTable(id,build){const d=$(id).closest('details');$(id).innerHTML='';d._build=build;if(d.open)build();d.ontoggle=()=>{if(d.open&&d._build)d._build()}}
+function table(id,head,rows){$(id).innerHTML=`<table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`}
+
+// What stages did a tracked job reach (from its full history, not only its current status)
+function reached(o){const S=new Set((o.h||[]).map(x=>x[0]));if(o.s)S.add(o.s);const has=(...a)=>a.some(x=>S.has(x));
+  return{saved:has('saved','applied','interview','offer','rejected'),applied:has('applied','interview','offer','rejected'),interview:has('interview','offer')||!!o.iv,offer:has('offer'),rejected:has('rejected')}}
+function jumpTo(set){$('#q').value='';$('#fCompany').value='';$('#fCity').value='';$('#fDate').value='';fStatus='active';fRole='';set();shown=60;go('jobs')}
+
+function renderStatsView(){
+  const wLine=$('#chLine').clientWidth,wWeeks=$('#chWeeks').clientWidth; // read layout once, before writing
+  const now=Date.now(),rel=jobs.filter(j=>!j.noise&&!j.blocked&&+j.date>0);
+  const first=rel.reduce((m,j)=>Math.min(m,+j.date),now);
+  const nDays=statRange||Math.min(180,Math.max(7,Math.ceil((now-first)/DAY)+1));
+  const days=lastDays(nDays),from=days[0],prevFrom=from-nDays*DAY;
+  $('#statScope').textContent=`מבוסס על ${rel.length} משרות רלוונטיות לפי הפרופיל שלך`+(statRange?'':` · ${nDays} הימים האחרונים`);
+
+  // one pass over jobs and over user history
+  const perDay=new Map(days.map(d=>[d,0]));let newCur=0,newPrev=0;
+  for(const j of rel){const t=+j.date;if(t>=from){newCur++;const k=dayStart(t);if(perDay.has(k))perDay.set(k,perDay.get(k)+1)}else if(t>=prevFrom)newPrev++}
+  const R=Object.values(st.jobs).map(reached);
+  const applyEvents=[];const actPerDay=new Map();const rt=[];
+  for(const [id,o] of Object.entries(st.jobs)){const h=o.h||[];
+    h.forEach(([s,t])=>{const k=dayStart(t);const a=actPerDay.get(k)||{n:0,ap:0};a.n++;if(s==='applied')a.ap++;actPerDay.set(k,a);if(s==='applied')applyEvents.push([id,t])});
+    const a=h.find(x=>x[0]==='applied');if(a){const ta=o.applied?+new Date(o.applied+'T12:00'):a[1];const b=h.find(x=>x[1]>a[1]&&['interview','rejected','offer'].includes(x[0]));if(b&&b[1]>ta)rt.push((b[1]-ta)/DAY)}}
+  const uniq=(lo,hi)=>new Set(applyEvents.filter(([,t])=>t>=lo&&t<hi).map(([id])=>id)).size;
+  const apCur=uniq(from,now+1),apPrev=uniq(prevFrom,from);
+  const nAp=R.filter(r=>r.applied).length,nIv=R.filter(r=>r.interview).length,nOf=R.filter(r=>r.offer).length,nSv=R.filter(r=>r.saved).length,nRj=R.filter(r=>r.rejected).length;
+  const active=jobs.filter(j=>['applied','interview'].includes(stOf(j))).length;
+  const hiOpen=rel.filter(j=>stOf(j)==='new'&&j.score>=70).length;
+  const delta=(c,p)=>!statRange?'':c===p?`ללא שינוי לעומת ${nDays} הימים הקודמים`:`<b>${c>p?'▲':'▼'} ${Math.abs(c-p)}</b> לעומת ${nDays} הימים הקודמים`;
+  const apDaily=days.map(d=>(actPerDay.get(d)||{ap:0}).ap);
+  const kpi=(l,v,d,spark)=>`<div class="kpi"><span class="k-l">${l}</span><span class="k-v">${v}</span><span class="k-d">${d||'&nbsp;'}</span>${spark||''}</div>`;
+  $('#kpis').innerHTML=[
+    kpi('משרות חדשות',newCur,delta(newCur,newPrev),sparkline([...perDay.values()])),
+    kpi('הגשות שלי',apCur,delta(apCur,apPrev),sparkline(apDaily)),
+    kpi('מעבר לראיון',nAp?`${pct(nIv,nAp)}<small>%</small>`:'—',nAp?`<b>${nIv}</b> ראיונות מתוך <b>${nAp}</b> הגשות`:'עוד אין הגשות למדידה'),
+    kpi('זמן תגובה ממוצע',rt.length?`${(rt.reduce((a,b)=>a+b,0)/rt.length).toFixed(1)}<small>ימים</small>`:'—',rt.length?`מהגשה ועד תשובה ראשונה (${rt.length} תהליכים)`:'יחושב כשתעדכן/י תשובה מחברה'),
+    kpi('תהליכים פעילים',active,active?'הגשות וראיונות שעדיין פתוחים':'אין כרגע תהליכים פתוחים'),
+    kpi('התאמה גבוהה שלא טופלה',hiOpen,hiOpen?'משרות עם ציון 70% ומעלה':'אין משרות כאלה כרגע'),
+  ].join('');
+
+  // timeline
+  const linePts=[...perDay.entries()];
+  lineChart('#chLine',linePts,v=>v===1?'<b>משרה חדשה אחת</b>':`<b>${v}</b> משרות חדשות`,wLine);
+  lazyTable('#tblLine',()=>table('#tblLine',['תאריך','משרות חדשות'],linePts.slice().reverse().map(([t,v])=>[fmtLong(t),v])));
+
+  // funnel
+  if(!nSv){$('#chFunnel').innerHTML='<div class="nodata">עוד לא סימנת משרות. ברגע שתסמן/י משרה כ"שמרתי" או "הגשתי", יופיע כאן המשפך.</div>'}
+  else{
+    const st4=[['סימנתי',nSv],['הגשתי',nAp],['ראיון',nIv],['הצעה',nOf]];
+    hbars('#chFunnel',st4.map(([l,v],i)=>({label:l,value:v,valueText:`<b>${v}</b>`,sub:i?`${pct(v,st4[i-1][1])}% מהשלב הקודם · ${pct(v,nSv)}% מכל מה שסימנת`:'',tip:v===1?`משרה אחת הגיעה לשלב "${l}"`:`<b>${v}</b> משרות הגיעו לשלב "${l}"`})),{max:nSv});
+    $('#chFunnel').insertAdjacentHTML('beforeend',`<div class="cv" style="margin-top:8px">❌ נדחו: <b>${nRj}</b>${nAp?` (${pct(nRj,nAp)}% מההגשות)`:''}</div>`);
+  }
+
+  // weekly applications vs goal
+  const goal=st.profile.goal||0,wk=[];const ws=new Date(weekStart());
+  for(let i=7;i>=0;i--){const a=new Date(ws);a.setDate(ws.getDate()-i*7);const b=new Date(a);b.setDate(a.getDate()+7);
+    const v=uniq(+a,+b),endD=new Date(b);endD.setDate(b.getDate()-1);
+    wk.push({label:i?fmtShort(+a):'השבוע',value:v,current:!i,tip:`<div class="t-h">${fmtShort(+a)}–${fmtShort(+endD)}</div>${cnt(v,'<b>הגשה אחת</b>','הגשות')}${goal?` · ${v>=goal?'✓ עמדת ביעד':`חסרו ${goal-v} ליעד`}`:''}`})}
+  colChart('#chWeeks',wk,goal,wWeeks);
+  lazyTable('#tblWeeks',()=>table('#tblWeeks',['שבוע','הגשות','יעד'],wk.slice().reverse().map(w=>[w.label,w.value,goal])));
+
+  // activity heatmap: 16 weeks, columns = weeks, rows = Sun..Sat
+  const W16=16,start=new Date(weekStart());start.setDate(start.getDate()-(W16-1)*7);const today0=dayStart(now);
+  const lv=v=>!v?'':v>=6?'l4':v>=4?'l3':v>=2?'l2':'l1';let cells='',activeDays=0;
+  for(let i=0;i<W16*7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=+d;
+    if(k>today0){cells+='<i class="fut"></i>';continue}const a=actPerDay.get(k);if(a)activeDays++;
+    cells+=`<i class="${a?lv(a.n):''}" data-t="${k}" data-n="${a?a.n:0}" data-a="${a?a.ap:0}" style="animation-delay:${Math.floor(i/7)*18}ms"></i>`}
+  $('#chHeat').innerHTML=`<div class="heatw"><div class="heatd"><span>א׳</span><span></span><span>ג׳</span><span></span><span>ה׳</span><span></span><span>ש׳</span></div><div class="heat">${cells}</div></div>
+    <div class="heatlg"><span>פחות</span><i style="background:var(--surface2)"></i><i class="l1" style="background:color-mix(in srgb,var(--accent) 30%,var(--surface))"></i><i style="background:color-mix(in srgb,var(--accent) 55%,var(--surface))"></i><i style="background:color-mix(in srgb,var(--accent) 78%,var(--surface))"></i><i style="background:var(--accent)"></i><span>יותר</span><span class="sp"></span><span>${activeDays} ימי פעילות ב-16 השבועות האחרונים</span></div>`;
+  const heat=$('#chHeat .heat');
+  heat.onpointermove=e=>{const c=e.target.closest('i[data-t]');if(!c)return hideTip();const n=+c.dataset.n,a=+c.dataset.a;
+    showTip(e,`<div class="t-h">${fmtLong(+c.dataset.t)}</div>${n?`${cnt(n,'<b>עדכון אחד</b>','עדכונים')}${a?` · ${a===1?'הגשה אחת':a+' הגשות'}`:''}`:'אין פעילות'}`)};
+  heat.onpointerleave=hideTip;
+
+  // channels
+  const src={};Object.values(st.jobs).forEach((o,i)=>{if(!R[i].applied)return;const k=o.src||'לא צוין';const s=src[k]||(src[k]={n:0,iv:0});s.n++;if(R[i].interview)s.iv++});
+  hbars('#chSrc',Object.entries(src).sort((a,b)=>b[1].n-a[1].n).map(([k,v])=>({label:k,value:v.n,valueText:`<b>${v.n}</b> · ${pct(v.iv,v.n)}%`,
+    tip:`<b>${esc(k)}</b><br>${v.n} הגשות · ${v.iv} הגיעו לראיון (${pct(v.iv,v.n)}%)`})),{empty:'יופיע אחרי שתסמן/י הגשות. מומלץ למלא "מקור" בפרטי כל משרה.'});
+
+  // distributions (clickable)
+  const total=rel.length,tipOf=(l,v)=>`<b>${esc(l)}</b><br>${v===1?'משרה אחת':v+' משרות'} · ${pct(v,total)}% מהמשרות הרלוונטיות`;
+  hbars('#chRole',count(rel.flatMap(j=>j.roles.length?j.roles:['אחר'])).map(([l,v])=>({label:l,value:v,tip:tipOf(l,v),go:()=>jumpTo(()=>{fRole=l})})));
+  hbars('#chRegion',count(rel.map(j=>j.region||'מיקום לא ידוע')).map(([l,v])=>({label:l,value:v,tip:tipOf(l,v),go:l==='מיקום לא ידוע'?null:()=>jumpTo(()=>{$('#fCity').value=l})})));
+  hbars('#chCompany',count(rel.map(j=>j.company)).slice(0,10).map(([l,v])=>({label:l,value:v,tip:tipOf(l,v),go:()=>jumpTo(()=>{$('#fCompany').value=l})})));
+  const LV_ORDER=['סטודנט','בוגר','ג׳וניור','מיד','בכיר','לא צוין'];const lvc=Object.fromEntries(count(rel.flatMap(j=>j.levels.length?j.levels:['לא צוין'])));
+  hbars('#chLevel',LV_ORDER.filter(l=>lvc[l]).map(l=>({label:l,value:lvc[l],tip:tipOf(l,lvc[l])})));
+}
+let rsT;addEventListener('resize',()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(view==='stats')renderStatsView()},120)});
+$('#rangeSeg').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;statRange=+b.dataset.r;document.querySelectorAll('#rangeSeg button').forEach(x=>x.classList.toggle('on',x===b));animateOnce('#v-stats');renderStatsView()};
+function animateOnce(sel){const el=$(sel);el.classList.remove('anim');void el.offsetWidth;el.classList.add('anim');clearTimeout(el._a);el._a=setTimeout(()=>el.classList.remove('anim'),1200)}
+
 /* ---------- COMPANIES ---------- */
+let cShown=60;
 function renderCompanies(){
   const q=$('#cq').value.toLowerCase(),cat=$('#cCat').value,only=$('#cOnly').checked,fav=$('#cFav').checked;
   const jm=Object.fromEntries(count(jobs.filter(j=>!j.noise).map(j=>j.company.toLowerCase())));
@@ -711,11 +1022,12 @@ function renderCompanies(){
   const known=new Set(list.map(c=>c.name.toLowerCase()));
   jobs.forEach(j=>{const k=j.company.toLowerCase();if(!known.has(k)){known.add(k);list.push({name:j.company,category:'—',career_url:j.custom?'':j.url,n:jm[k]||0})}});
   list=list.filter(c=>(!q||c.name.toLowerCase().includes(q))&&(!cat||c.category===cat)&&(!only||c.n)&&(!fav||st.favs[c.name])).sort((a,b)=>(!!st.favs[b.name]-!!st.favs[a.name])||b.n-a.n||a.name.localeCompare(b.name));
+  const total=list.length;list=list.slice(0,cShown);
   $('#ctbl').innerHTML=list.map(c=>{const k=c.name.toLowerCase(),m=mine[k]||[],ref=refMap[k];return`<tr>
     <td><button class="btn sm" data-fav="${esc(c.name)}">${st.favs[c.name]?'⭐':'☆'}</button></td><td><b>${esc(c.name)}</b></td><td style="color:var(--muted);font-size:13px">${esc(c.category)}</td>
     <td>${c.n?`<a href="#" data-co="${esc(c.name)}">${c.n} משרות</a>`:'<span style="color:var(--muted)">0</span>'}</td>
     <td style="font-size:13px">${m.length?m.map(s=>SL(s).e).join(' '):'—'}</td><td style="font-size:13px">${ref?esc(ref.referral_contact):'—'}</td>
-    <td>${c.career_url?`<a class="btn sm" href="${esc(c.career_url)}" target="_blank" rel="noopener">דף קריירה ↗</a>`:''}</td></tr>`}).join('');
+    <td>${safeUrl(c.career_url)?`<a class="btn sm" href="${esc(safeUrl(c.career_url))}" target="_blank" rel="noopener">דף קריירה ↗</a>`:''}</td></tr>`}).join('')+(total>cShown?`<tr><td colspan="7" style="text-align:center"><button class="btn" id="cMore">הצג עוד ${total-cShown} חברות</button></td></tr>`:'');
 }
 
 /* ---------- TEMPLATES ---------- */
@@ -765,11 +1077,11 @@ function renderFollow(){
 let view='jobs';
 const VIEWS={jobs:renderJobs,board:renderBoard,tasks:renderTasks,stats:renderStatsView,companies:renderCompanies,templates:renderTemplates,profile:renderProfile};
 function renderAll(){updateTaskDot();renderFollow();VIEWS[view]()}
-function go(v){view=v;document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));document.querySelectorAll('main>section').forEach(s=>s.classList.toggle('hide',s.id!=='v-'+v));try{history.replaceState(null,'','#'+v)}catch(e){}renderAll();scrollTo(0,0)}
+function go(v){if(v!==view&&v==='stats')animateOnce('#v-stats');view=v;document.querySelectorAll('#nav button').forEach(b=>{b.classList.toggle('on',b.dataset.v===v);if(b.dataset.v===v&&b.scrollIntoView)b.scrollIntoView({block:'nearest',inline:'nearest'})});document.querySelectorAll('main>section').forEach(s=>s.classList.toggle('hide',s.id!=='v-'+v));try{history.replaceState(null,'','#'+v)}catch(e){}renderAll();scrollTo(0,0)}
 
 $('#nav').onclick=e=>{const b=e.target.closest('button');if(b)go(b.dataset.v)};
 ['#q','#fCompany','#fCity','#fDate','#fSort','#fNoise','#fMyCities'].forEach(s=>$(s).addEventListener('input',()=>{shown=60;renderJobs()}));
-['#cq','#cCat','#cOnly','#cFav'].forEach(s=>$(s).addEventListener('input',renderCompanies));
+['#cq','#cCat','#cOnly','#cFav'].forEach(s=>$(s).addEventListener('input',()=>{cShown=60;renderCompanies()}));
 $('#statusChips').onclick=e=>{const b=e.target.closest('[data-s]');if(b){fStatus=b.dataset.s;shown=60;renderJobs()}};
 $('#roleChips').onclick=e=>{const b=e.target.closest('[data-r]');if(b){fRole=b.dataset.r;shown=60;renderJobs()}};
 $('#grid').addEventListener('change',e=>{const c=e.target.closest('.card');if(e.target.matches('[data-st]')){setStatus(c.dataset.id,e.target.value);toast(e.target.value==='applied'?`בהצלחה! נקבעה תזכורת פולואפ בעוד ${st.profile.follow} ימים`:'הסטטוס עודכן');renderAll()}});
@@ -797,7 +1109,7 @@ document.addEventListener('click',e=>{
   if(g){e.preventDefault();const v=g.dataset.goto;if(v==='saved'){fStatus='saved';go('jobs')}else if(v==='match'){fStatus='new';$('#fSort').value='match';go('jobs')}else go(v)}
   if(e.target.id==='showSince'){$('#fDate').value='since';fStatus='active';renderJobs()}
 });
-$('#ctbl').onclick=e=>{const f=e.target.closest('[data-fav]');if(f){const n=f.dataset.fav;st.favs[n]?delete st.favs[n]:st.favs[n]=1;save();scoreAll();renderCompanies()}
+$('#ctbl').onclick=e=>{if(e.target.id==='cMore'){cShown+=120;renderCompanies();return}const f=e.target.closest('[data-fav]');if(f){const n=f.dataset.fav;st.favs[n]?delete st.favs[n]:st.favs[n]=1;save();scoreAll();renderCompanies()}
   const co=e.target.closest('[data-co]');if(co){e.preventDefault();$('#fCompany').value=co.dataset.co;fStatus='all';go('jobs')}};
 $('#exportCsv').onclick=()=>{
   const rows=[['חברה','תפקיד','סטטוס','עדיפות','תאריך הגשה','מקור','איש קשר','צעד הבא','תאריך צעד הבא','ראיון','שכר','הערות','קישור']];
@@ -827,7 +1139,7 @@ $('#restore').onchange=e=>readFile(e.target,d=>{if(!d.state){toast('זה לא ק
 $('#themeBtn').onclick=()=>{const dark=matchMedia('(prefers-color-scheme: dark)').matches;const cur=document.documentElement.dataset.theme||(dark?'dark':'light');st.theme=cur==='dark'?'light':'dark';document.documentElement.dataset.theme=st.theme;save()};
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){document.querySelectorAll('.modal.on').forEach(m=>m.classList.remove('on'));if(openId){openId=null;renderAll()}return}
-  if(e.target.matches('input,textarea,select')||document.querySelector('.modal.on'))return;
+  if((e.target.matches&&e.target.matches('input,textarea,select'))||document.querySelector('.modal.on'))return;
   if(e.key==='/'){e.preventDefault();go('jobs');$('#q').focus()}
   if(e.key==='n'){e.preventDefault();$('#addBtn').click()}
   const v=Object.keys(VIEWS)[+e.key-1];if(v)go(v)});

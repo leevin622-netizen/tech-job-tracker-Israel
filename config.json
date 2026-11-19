@@ -1,6 +1,6 @@
 {
   "min_yoe": 0,
-  "max_yoe": 2,
+  "max_yoe": 10,
   "location": "Israel",
   "include_student_and_graduate": true,
   "target_roles": [

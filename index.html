@@ -169,6 +169,7 @@ kbd{background:var(--surface2);border:1px solid var(--border);border-radius:4px;
         <option value="">כל התאריכים</option><option value="since">מאז הביקור הקודם</option><option value="1">24 שעות אחרונות</option>
         <option value="3">3 ימים</option><option value="7">שבוע</option><option value="30">חודש</option>
       </select>
+      <select id="fYoe" title="כמה שנות ניסיון יש לך? המשרות מסוננות ומדורגות לפי זה"></select>
       <select id="fSort">
         <option value="match">התאמה אליי</option><option value="new">החדשות ביותר</option><option value="old">הישנות ביותר</option>
         <option value="company">לפי חברה</option><option value="prio">לפי עדיפות</option>
@@ -396,16 +397,18 @@ function wordRe(w){return new RegExp('(^|[^a-z0-9א-ת])'+reEsc(w.toLowerCase())
 
 function enrichOne(r,custom){
   const title=cleanTitle(r.title),j={...r,title,custom:!!custom};
-  const text=title+' '+(r.url||'');
+  const text=title+' '+(r.url||'')+' '+(r.location&&!/^israel$/i.test(r.location)?r.location:'');
   j.id=r.id||hash(r.url||dedupKey(j));
   j.roles=ROLES.filter(([,re])=>re.test(text)).map(([n])=>n);
   j.levels=LEVELS.filter(([,re])=>re.test(text)).map(([n])=>n);
+  const SEN={student:'סטודנט',junior:'ג׳וניור',mid:'מיד',senior:'בכיר',lead:'בכיר'};
+  if(r.seniority&&SEN[r.seniority]){j.levels=j.levels.filter(l=>l!=='מיד'&&l!=='בכיר');if(!j.levels.includes(SEN[r.seniority]))j.levels.push(SEN[r.seniority])}
   const c=CITIES.find(([,,re])=>re.test(text));
   j.city=r.cityName||(c?c[0]:'');
   j.region=r.cityName?(CITY_REGION[r.cityName]||(REGIONS.includes(r.cityName)?r.cityName:'')):c?c[1]:((REGION_HINTS.find(([,h])=>new RegExp(h,'i').test(text))||[''])[0]);
   if(!j.city)j.city=j.region||'לא צוין';
   j.date=new Date(r.discovered_at||0);
-  const ym=title.match(/(\d{1,2})\s*\+?\s*(?:-\s*\d+\s*)?(?:years|yrs|שנות|שנים)/i);j.yoe=ym?+ym[1]:null;
+  const ym=title.match(/(\d{1,2})\s*\+?\s*(?:-\s*\d+\s*)?(?:years|yrs|שנות|שנים)/i);j.yoe=Number.isInteger(r.min_yoe)?r.min_yoe:ym?+ym[1]:null;
   j.baseNoise=!custom&&(NOISE.test(title)||title.length<6||NON_TECH.test(title)||j.region==='חו"ל');
   j.baseWhy=j.region==='חו"ל'?'מחוץ לישראל':NON_TECH.test(title)?'תפקיד לא טכני':'נראה כמו דף כללי';
   return j;
@@ -484,7 +487,7 @@ function setup(){
   fill('#fCompany',[...new Set(jobs.map(j=>j.company))].sort((a,b)=>a.localeCompare(b)));
   const cnt={};jobs.filter(j=>!j.noise).forEach(j=>{cnt[j.city]=(cnt[j.city]||0)+1;if(j.region&&j.region!==j.city)cnt[j.region]=(cnt[j.region]||0)+1});
   $('#placeList').innerHTML=REGIONS.map(r=>`<option value="${esc(r)}">אזור${cnt[r]?' · '+cnt[r]+' משרות':''}</option>`).join('')+CITY_DATA.filter(c=>!REGIONS.includes(c[0])).map(([c,r])=>`<option value="${esc(c)}">${esc(r)}${cnt[c]?' · '+cnt[c]+' משרות':''}</option>`).join('');
-  $('#yoeBadge').textContent=yoeLabel();
+  $('#yoeBadge').textContent=yoeLabel();syncYoeSelect();
   fill('#cCat',[...new Set(companies.map(c=>c.category))].sort());
 
   $('#aSt').innerHTML=STATUSES.filter(s=>s.k!=='dismissed').map(s=>`<option value="${s.k}">${s.e} ${s.l}</option>`).join('');$('#aSt').value='saved';
@@ -734,7 +737,9 @@ function renderProfile(){
   tags('#skillsTags',p.skills,'skills');tags('#cityTags',p.cities,'cities');tags('#blockTags',p.block,'block');
   $('#roleTags').innerHTML=ROLES.map(r=>`<button class="chip ${p.roles.includes(r[0])?'on':''}" data-role="${esc(r[0])}">${esc(r[0])}</button>`).join('');
 }
-function profChanged(){save();scoreAll();renderProfile();$('#yoeBadge').textContent=yoeLabel()}
+function syncYoeSelect(){const p=st.profile,yi=YOE_OPTS.findIndex(([a,b])=>a===p.yoeMin&&b===p.yoeMax);
+  $('#fYoe').innerHTML=YOE_OPTS.map((o,i)=>`<option value="${i}">🎓 ניסיון: ${o[2]}</option>`).join('')+(yi<0?`<option value="" selected>🎓 ניסיון: ${p.yoeMin}–${p.yoeMax} שנים</option>`:'');if(yi>=0)$('#fYoe').value=yi}
+function profChanged(){save();scoreAll();if(view==='profile')renderProfile();$('#yoeBadge').textContent=yoeLabel();syncYoeSelect()}
 document.querySelectorAll('.tagsin').forEach(el=>el.addEventListener('click',e=>{const s=e.target.closest('[data-k]');if(s){st.profile[s.dataset.k].splice(+s.dataset.i,1);profChanged()}}));
 function tagInput(sel,key){$(sel).addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===','){e.preventDefault();e.target.value.split(',').map(v=>v.trim()).filter(Boolean).forEach(v=>{if(!st.profile[key].some(x=>x.toLowerCase()===v.toLowerCase()))st.profile[key].push(v)});e.target.value='';profChanged()}})}
 tagInput('#skillIn','skills');tagInput('#blockIn','block');
@@ -743,6 +748,7 @@ function addPlace(v){v=v.trim();if(!v)return;const known=ALL_PLACES.find(x=>x===
   if(!known){toast('לא מצאתי את המיקום הזה ברשימה');return}if(!st.profile.cities.includes(known))st.profile.cities.push(known);$('#cityIn').value='';profChanged()}
 $('#cityIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addPlace(e.target.value)}});
 $('#cityIn').addEventListener('change',e=>{if(ALL_PLACES.includes(e.target.value.trim()))addPlace(e.target.value)});
+$('#fYoe').onchange=e=>{if(e.target.value==='')return;const[a,b]=YOE_OPTS[+e.target.value];st.profile.yoeMin=a;st.profile.yoeMax=b;profChanged();setup();renderJobs();toast('טווח הניסיון עודכן: '+yoeLabel())};
 $('#pYoe').onchange=e=>{if(e.target.value==='')return;const[a,b]=YOE_OPTS[+e.target.value];st.profile.yoeMin=a;st.profile.yoeMax=b;profChanged();setup()};
 ['#pYoeMin','#pYoeMax'].forEach(s=>$(s).addEventListener('change',()=>{const a=Math.max(0,+$('#pYoeMin').value||0),b=Math.max(a,+$('#pYoeMax').value||a);st.profile.yoeMin=a;st.profile.yoeMax=b;profChanged();setup()}));
 $('#roleTags').onclick=e=>{const b=e.target.closest('[data-role]');if(!b)return;const r=b.dataset.role,a=st.profile.roles;a.includes(r)?a.splice(a.indexOf(r),1):a.push(r);profChanged()};

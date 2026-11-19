@@ -60,7 +60,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip().strip('"').strip("'")
 
 DEFAULT_CONFIG = {
     "min_yoe": 0,
-    "max_yoe": 2,
+    "max_yoe": 10,
     "location": "Israel",
     "include_student_and_graduate": True,
     "target_roles": [
@@ -242,8 +242,9 @@ def build_candidate_title_regex(cfg):
     if cfg.get("include_student_and_graduate", True):
         base_keywords.extend([r"intern\b", r"internship", r"student", r"graduate", r"grad\b"])
 
-    if int(cfg.get("max_yoe", 2)) <= 2:
-        base_keywords.extend([r"junior", r"entry[\s\-_]*level"])
+    # Junior / entry-level keywords are always useful candidates; the website lets
+    # each user choose their own experience range, so they are never excluded here.
+    base_keywords.extend([r"junior", r"entry[\s\-_]*level"])
 
     for role in cfg.get("target_roles", []):
         tokens = re.findall(r"[a-zA-Z0-9\+\-#]+", str(role).lower())
@@ -799,6 +800,8 @@ def batch_verify_jobs_with_ai(jobs_batch):
         '      "is_matching_location": true/false,\n'
         '      "approved": true/false,\n'
         f'      "experience_summary": "e.g. {min_yoe}-{max_yoe} YOE summary",\n'
+        '      "min_years_required": "integer minimum years of experience the posting requires (0 for student/junior/entry roles with no requirement), or null if truly unknown",\n'
+        '      "seniority": "one of: student, junior, mid, senior, lead",\n'
         f'      "detected_city": "e.g. Tel Aviv / {TARGET_LOCATION}",\n'
         '      "rejection_reason": "short explanation if rejected"\n'
         "    }\n"
@@ -1021,6 +1024,15 @@ def main():
                         location = ev.get("detected_city") or TARGET_LOCATION
                         exp_sum = ev.get("experience_summary") or default_exp_label
 
+                        min_req = ev.get("min_years_required")
+                        try:
+                            min_req = int(min_req) if min_req is not None and str(min_req).strip() != "" else None
+                        except (TypeError, ValueError):
+                            min_req = None
+                        seniority = str(ev.get("seniority") or "").strip().lower()
+                        if seniority not in ("student", "junior", "mid", "senior", "lead"):
+                            seniority = None
+
                         entry = {
                             "company": job["company"],
                             "title": job["title"],
@@ -1029,6 +1041,8 @@ def main():
                             "location": location,
                             "url": job["url"],
                             "experience": exp_sum,
+                            "min_yoe": min_req,
+                            "seniority": seniority,
                             "discovered_at": datetime.now().isoformat()
                         }
                         confirmed_new_jobs.append(entry)

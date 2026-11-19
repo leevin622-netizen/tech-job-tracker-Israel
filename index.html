@@ -129,7 +129,7 @@ kbd{background:var(--surface2);border:1px solid var(--border);border-radius:4px;
 <header>
   <div class="wrap">
     <div class="hrow">
-      <div class="logo">🇮🇱 מנהל חיפוש עבודה <span>ג'וניור 0–2</span></div>
+      <div class="logo">🇮🇱 מנהל חיפוש עבודה <span id="yoeBadge" title="שינוי בלשונית הפרופיל"></span></div>
       <div class="sp"></div>
       <span id="lastUpdate" style="color:var(--muted);font-size:13px"></span>
       <button class="btn" id="addBtn" title="הוספת משרה שמצאת במקום אחר">➕ משרה</button>
@@ -164,7 +164,7 @@ kbd{background:var(--surface2);border:1px solid var(--border);border-radius:4px;
     <div class="filters">
       <input type="search" id="q" placeholder="חיפוש חופשי: תפקיד, חברה, טכנולוגיה… (קיצור: /)">
       <select id="fCompany"><option value="">כל החברות</option></select>
-      <select id="fCity"><option value="">כל המיקומים</option></select>
+      <input id="fCity" list="placeList" placeholder="📍 עיר או אזור…" style="flex:0 1 170px"><datalist id="placeList"></datalist>
       <select id="fDate">
         <option value="">כל התאריכים</option><option value="since">מאז הביקור הקודם</option><option value="1">24 שעות אחרונות</option>
         <option value="3">3 ימים</option><option value="7">שבוע</option><option value="30">חודש</option>
@@ -173,7 +173,7 @@ kbd{background:var(--surface2);border:1px solid var(--border);border-radius:4px;
         <option value="match">התאמה אליי</option><option value="new">החדשות ביותר</option><option value="old">הישנות ביותר</option>
         <option value="company">לפי חברה</option><option value="prio">לפי עדיפות</option>
       </select>
-      <label class="ck"><input type="checkbox" id="fMyCities"> רק הערים שלי</label>
+      <label class="ck"><input type="checkbox" id="fMyCities"> רק המיקומים שלי</label>
       <label class="ck"><input type="checkbox" id="fNoise"> הצג רעש</label>
     </div>
     <div class="chips" id="statusChips"></div>
@@ -243,6 +243,8 @@ kbd{background:var(--surface2);border:1px solid var(--border);border-radius:4px;
       <div class="panel"><h3>👤 פרטים</h3>
         <div class="form">
           <label class="full">השם שלי (לתבניות)<input id="pName"></label>
+          <label class="full">שנות הניסיון שלי<select id="pYoe"></select></label>
+          <label class="full" style="flex-direction:row;gap:8px;align-items:center;flex-wrap:wrap">או טווח מותאם: מ-<input type="number" min="0" max="40" id="pYoeMin" style="width:70px"> עד <input type="number" min="0" max="40" id="pYoeMax" style="width:70px"> שנים</label>
           <label>יעד הגשות שבועי<input type="number" min="1" max="100" id="pGoal"></label>
           <label>פולואפ אחרי כמה ימים<input type="number" min="2" max="60" id="pFollow"></label>
         </div>
@@ -250,8 +252,8 @@ kbd{background:var(--surface2);border:1px solid var(--border);border-radius:4px;
       <div class="panel"><h3>🧠 הכישורים שלי</h3><p class="hint">משרות שמזכירות את הכישורים האלה יקבלו ציון התאמה גבוה יותר. Enter להוספה, לחיצה להסרה.</p>
         <div class="tagsin" id="skillsTags"></div><input id="skillIn" placeholder="למשל: Python, React, SQL" style="width:100%">
       </div>
-      <div class="panel"><h3>📍 ערים מועדפות</h3><p class="hint">משרות בערים האלה יקבלו בונוס בציון. אפשר גם לסנן רק אותן.</p>
-        <div class="tagsin" id="cityTags"></div><select id="cityIn" style="width:100%"><option value="">בחר עיר להוספה…</option></select>
+      <div class="panel"><h3>📍 מיקומים מועדפים</h3><p class="hint">אפשר לבחור עיר או אזור שלם (למשל "השרון" או "גוש דן"). משרות במיקומים האלה יקבלו בונוס בציון, ואפשר גם לסנן רק אותן.</p>
+        <div class="tagsin" id="cityTags"></div><input id="cityIn" list="placeList" placeholder="הקלד/י עיר או אזור ולחץ/י Enter" style="width:100%">
       </div>
       <div class="panel"><h3>🚫 מילים חוסמות</h3><p class="hint">משרות שהכותרת שלהן מכילה אחת מהמילים יוסתרו (למשל: Senior, Team Lead, C++).</p>
         <div class="tagsin" id="blockTags"></div><input id="blockIn" placeholder="מילה להסתרה" style="width:100%">
@@ -325,15 +327,35 @@ const ROLES=[
   ['סייבר',/cyber|security|סייבר|אבטחת/i],
   ['ענן ותשתיות',/devops|sre|cloud|mlops|platform/i],
 ];
-const LEVELS=[['סטודנט',/student|intern|סטודנט|internship|התמחות/i],['בוגר',/graduate|grad\b|new grad|בוגר|upnext/i],['ג׳וניור',/junior|entry|ג'וניור|גוניור|jr\.?/i]];
-const SENIOR=/\b(senior|sr\.?|lead|principal|staff|architect|manager|head of)\b|בכיר|ראש צוות/i;
-const CITIES=[
-  ['תל אביב',/tel[\s-]?aviv|תל אביב|ת"א/i],['רמת גן',/ramat gan|רמת גן/i],['הרצליה',/herzliya|הרצליה/i],
-  ['פתח תקווה',/petah|petach|פתח תקו/i],['ירושלים',/jerusalem|ירושלים/i],['חיפה',/haifa|חיפה/i],['כפר סבא',/kfar saba|כפר סבא/i],
-  ['נתניה',/netanya|נתניה/i],['רעננה',/ra'?anana|רעננה/i],['חולון',/holon|חולון/i],['באר שבע',/beer|be'er|באר שבע/i],
-  ['הוד השרון',/hod hasharon|הוד השרון/i],['יקנעם',/yokneam|יקנעם/i],['ראשון לציון',/rishon|ראשון לציון/i],['גוש דן',/גוש דן|gush dan|center district|מרכז/i],
-  ['חו"ל',/bangkok|thailand|philippines|london|new york|usa|india|poland|ukraine|remote - us/i],
+const LEVELS=[['סטודנט',/student|intern|סטודנט|internship|התמחות/i],['בוגר',/graduate|grad\b|new grad|בוגר|upnext/i],['ג׳וניור',/junior|entry|ג'וניור|גוניור|jr\.?/i],
+  ['מיד',/\bmid\b|mid-level|intermediate|\bII\b|מנוסה/i],['בכיר',/\b(senior|sr\.?|lead|principal|staff|architect|head of)\b|בכיר|ראש צוות/i]];
+const JUNIOR_LV=['סטודנט','בוגר','ג׳וניור'];
+const YOE_OPTS=[[0,1,'ללא ניסיון / סטודנט'],[0,2,'0–2 שנים (ג׳וניור)'],[1,3,'1–3 שנים'],[2,5,'2–5 שנים'],[3,6,'3–6 שנים'],[5,8,'5–8 שנים (בכיר)'],[8,40,'8+ שנים']];
+// [שם, אזור, מילים נוספות לזיהוי (אנגלית / כתיב חלופי)]
+const REGIONS=['גוש דן','השרון','השפלה','ירושלים והסביבה','חיפה והקריות','הצפון','הדרום','יהודה ושומרון','עבודה מרחוק','חו"ל'];
+const CITY_DATA=[
+  ['תל אביב','גוש דן','tel aviv|tel-aviv|telaviv|ת"א|תל-אביב'],['רמת גן','גוש דן','ramat gan|ramat-gan'],['גבעתיים','גוש דן','givatayim'],
+  ['בני ברק','גוש דן','bnei brak|bney brak'],['פתח תקווה','גוש דן','petah tikva|petach tikva|petah tiqwa|פתח תקוה|פ"ת'],['חולון','גוש דן','holon'],
+  ['בת ים','גוש דן','bat yam'],['אור יהודה','גוש דן','or yehuda'],['קריית אונו','גוש דן','kiryat ono'],['יהוד','גוש דן','yehud'],['ראש העין','גוש דן','rosh haayin|rosh ha\'ayin'],
+  ['אלעד','גוש דן','elad'],['שוהם','גוש דן','shoham'],['איירפורט סיטי','גוש דן','airport city'],
+  ['הרצליה','השרון','herzliya|herzlia'],['רעננה','השרון','raanana|ra\'anana'],['כפר סבא','השרון','kfar saba|kfar-saba'],['הוד השרון','השרון','hod hasharon'],
+  ['נתניה','השרון','netanya'],['רמת השרון','השרון','ramat hasharon'],['כפר יונה','השרון','kfar yona'],['אבן יהודה','השרון','even yehuda'],['כוכב יאיר','השרון','kochav yair'],
+  ['ראשון לציון','השפלה','rishon lezion|rishon le zion|rishon'],['רחובות','השפלה','rehovot'],['נס ציונה','השפלה','ness ziona|nes ziona'],['לוד','השפלה','lod'],
+  ['רמלה','השפלה','ramla'],['מודיעין','השפלה','modiin|modi\'in'],['יבנה','השפלה','yavne'],['אשדוד','השפלה','ashdod'],['גדרה','השפלה','gedera'],['קריית גת','הדרום','kiryat gat'],
+  ['ירושלים','ירושלים והסביבה','jerusalem'],['בית שמש','ירושלים והסביבה','beit shemesh|beit-shemesh'],['מבשרת ציון','ירושלים והסביבה','mevaseret'],['הר חוצבים','ירושלים והסביבה','har hotzvim'],
+  ['חיפה','חיפה והקריות','haifa|מת"ם|matam'],['קריית ביאליק','חיפה והקריות','kiryat bialik'],['קריית אתא','חיפה והקריות','kiryat ata'],['טירת כרמל','חיפה והקריות','tirat carmel'],['נשר','חיפה והקריות','nesher'],
+  ['יקנעם','הצפון','yokneam|yoqneam|יוקנעם'],['נצרת','הצפון','nazareth'],['עפולה','הצפון','afula'],['כרמיאל','הצפון','karmiel'],['קיסריה','הצפון','caesarea'],['חדרה','הצפון','hadera'],
+  ['זכרון יעקב','הצפון','zichron yaakov|zikhron'],['מגדל העמק','הצפון','migdal haemek|migdal ha\'emek'],['תפן','הצפון','tefen'],['טבריה','הצפון','tiberias'],['קריית שמונה','הצפון','kiryat shmona'],['עכו','הצפון','acre|akko'],['נהריה','הצפון','nahariya'],
+  ['באר שבע','הדרום','beer sheva|be\'er sheva|beersheba'],['אשקלון','הדרום','ashkelon'],['דימונה','הדרום','dimona'],['אילת','הדרום','eilat'],['אופקים','הדרום','ofakim'],['שדרות','הדרום','sderot'],
+  ['אריאל','יהודה ושומרון','ariel'],['מודיעין עילית','יהודה ושומרון','modiin illit'],['מעלה אדומים','יהודה ושומרון','maale adumim'],
+  ['עבודה מהבית','עבודה מרחוק','remote|work from home|wfh|היברידי|hybrid|מהבית'],
+  ['חו"ל','חו"ל','bangkok|thailand|philippines|london|new york|usa|united states|india|poland|ukraine|germany|berlin|paris|amsterdam|cyprus|limassol'],
 ];
+const REGION_HINTS=[['גוש דן','גוש דן|gush dan|center district|central district|מרכז|center, israel'],['השרון','השרון|sharon'],['הצפון','north district|northern|צפון'],['הדרום','south district|southern|דרום'],['ירושלים והסביבה','jerusalem district']];
+const CITIES=CITY_DATA.map(([he,reg,alt])=>{const parts=alt.split('|'),en=parts.filter(p=>/[a-z]/i.test(p)),hb=[he,...parts.filter(p=>!/[a-z]/i.test(p))].map(reEscStr);
+  return[he,reg,new RegExp(hb.join('|')+(en.length?'|\\b(?:'+en.join('|')+')\\b':''),'i')]});
+function reEscStr(s){return s.replace(/[.*+?^${}()[\]\\]/g,'\\$&')}
+const CITY_REGION=Object.fromEntries(CITY_DATA.map(([he,reg])=>[he,reg]));
 const NOISE=/^(developer zone|entry-level roles|students?\s*&?\s*internship|careers?|jobs?|ai לתחום.*|.*מדריך.*|דרושים .*)$/i;
 const NON_TECH=/customer success|supply operation|sales|marketing|support engineer|\bhr\b|recruit/i;
 const DEFAULT_TPL=[
@@ -347,7 +369,7 @@ let jobs=[],companies=[],refMap={};
 let st=load();
 let prevVisit=st.lastVisit||0;
 function defaults(){return{jobs:{},favs:{},theme:null,custom:[],lastVisit:0,lastBackup:0,
-  profile:{name:'',goal:10,follow:7,skills:[],cities:[],block:[],roles:[]},tpl:DEFAULT_TPL.map(t=>({...t}))}}
+  profile:{name:'',goal:10,follow:7,skills:[],cities:[],block:[],roles:[],yoeMin:0,yoeMax:2},tpl:DEFAULT_TPL.map(t=>({...t}))}}
 function load(){let s;try{s=JSON.parse(localStorage.getItem(LS)||'{}')}catch(e){s={}}const d=defaults();const o=Object.assign(d,s);o.profile=Object.assign(defaults().profile,s.profile||{});if(!Array.isArray(o.tpl)||!o.tpl.length)o.tpl=d.tpl;return o}
 function save(){try{localStorage.setItem(LS,JSON.stringify(st))}catch(e){}}
 try{refMap=JSON.parse(localStorage.getItem('jt2_refs')||'{}')}catch(e){}
@@ -378,11 +400,14 @@ function enrichOne(r,custom){
   j.id=r.id||hash(r.url||dedupKey(j));
   j.roles=ROLES.filter(([,re])=>re.test(text)).map(([n])=>n);
   j.levels=LEVELS.filter(([,re])=>re.test(text)).map(([n])=>n);
-  j.city=r.cityName||(CITIES.find(([,re])=>re.test(text))||['לא צוין'])[0];
+  const c=CITIES.find(([,,re])=>re.test(text));
+  j.city=r.cityName||(c?c[0]:'');
+  j.region=r.cityName?(CITY_REGION[r.cityName]||(REGIONS.includes(r.cityName)?r.cityName:'')):c?c[1]:((REGION_HINTS.find(([,h])=>new RegExp(h,'i').test(text))||[''])[0]);
+  if(!j.city)j.city=j.region||'לא צוין';
   j.date=new Date(r.discovered_at||0);
-  j.senior=SENIOR.test(title)&&!j.levels.length;
-  j.noise=!custom&&(NOISE.test(title)||title.length<6||NON_TECH.test(title)||j.city==='חו"ל'||j.senior);
-  j.noiseWhy=j.city==='חו"ל'?'מחוץ לישראל':j.senior?'נראית כמשרה בכירה':NON_TECH.test(title)?'תפקיד לא טכני':'נראה כמו דף כללי';
+  const ym=title.match(/(\d{1,2})\s*\+?\s*(?:-\s*\d+\s*)?(?:years|yrs|שנות|שנים)/i);j.yoe=ym?+ym[1]:null;
+  j.baseNoise=!custom&&(NOISE.test(title)||title.length<6||NON_TECH.test(title)||j.region==='חו"ל');
+  j.baseWhy=j.region==='חו"ל'?'מחוץ לישראל':NON_TECH.test(title)?'תפקיד לא טכני':'נראה כמו דף כללי';
   return j;
 }
 function enrich(raw){
@@ -393,19 +418,31 @@ function enrich(raw){
 }
 let rawJobs=[];
 function rebuild(){jobs=enrich(rawJobs);scoreAll()}
+// התאמת רמת הניסיון של המשרה לטווח שהמשתמש בחר
+function levelFit(j,mn,mx){
+  const L=j.levels,jr=L.some(l=>JUNIOR_LV.includes(l)),mid=L.includes('מיד'),sr=L.includes('בכיר'),stu=L.includes('סטודנט');
+  if(j.yoe!=null){if(j.yoe>mx+1)return{d:-30,mismatch:true,why:`דורשת ${j.yoe}+ שנות ניסיון`};if(j.yoe>=mn)return{d:25,why:`דורשת ${j.yoe} שנות ניסיון, בטווח שלך`};return{d:5,why:`דורשת ${j.yoe} שנות ניסיון`}}
+  if(mx<=2){if(sr&&!jr)return{d:-30,mismatch:true,why:'נראית כמשרה בכירה'};if(jr)return{d:20,why:'מתאים לרמה: '+L.filter(l=>JUNIOR_LV.includes(l)).join(', ')};return{d:0}}
+  if(mn>=5){if(stu||(jr&&!sr))return{d:-30,mismatch:true,why:'משרה לג׳וניורים'};if(sr)return{d:20,why:'משרה בכירה'};if(mid)return{d:10};return{d:5}}
+  if(stu&&mn>=1)return{d:-25,mismatch:true,why:'משרת סטודנט'};
+  if(mid)return{d:20,why:'משרה ברמת ביניים'};if(sr)return{d:mx>=5?10:-15,why:'משרה בכירה'};if(jr)return{d:mn<=1?15:0};return{d:10};
+}
+const placeMatch=(j,pl)=>pl===j.city||pl===j.region;
+const inMyPlaces=j=>st.profile.cities.some(pl=>placeMatch(j,pl));
+const yoeLabel=()=>{const p=st.profile,o=YOE_OPTS.find(([a,b])=>a===p.yoeMin&&b===p.yoeMax);return o?o[2]:`${p.yoeMin}–${p.yoeMax} שנים`};
 function scoreAll(){
   const p=st.profile,skillRes=p.skills.map(s=>[s,wordRe(s)]);
   for(const j of jobs){
     const t=j.title+' '+j.url;
     let sc=30,why=[];
-    if(j.levels.length){sc+=20;why.push('מתאים לרמה: '+j.levels.join(', '))}
-    else if(/junior|student|graduate|ג'וניור|סטודנט|בוגר/i.test(j.title)){sc+=15}
+    const lv=levelFit(j,p.yoeMin,p.yoeMax);sc+=lv.d;if(lv.why)why.push(lv.why);
+    j.noise=j.baseNoise||(!j.custom&&!!lv.mismatch);j.noiseWhy=j.baseNoise?j.baseWhy:lv.why;
     const hit=skillRes.filter(([,re])=>re.test(t)).map(([s])=>s);
     if(hit.length){sc+=Math.min(30,hit.length*15);why.push('כישורים: '+hit.join(', '))}
     const rh=j.roles.filter(r=>p.roles.includes(r));
     if(rh.length){sc+=15;why.push('תחום מועדף: '+rh.join(', '))}
     else if(p.roles.length&&j.roles.length)sc-=10;
-    if(p.cities.includes(j.city)){sc+=10;why.push('עיר מועדפת')}
+    if(inMyPlaces(j)){sc+=10;why.push('מיקום מועדף')}
     if(st.favs[j.company]){sc+=10;why.push('חברה מועדפת')}
     if(refMap[j.company.toLowerCase()]){sc+=10;why.push('יש רפרל')}
     if(j.noise)sc-=40;
@@ -438,16 +475,18 @@ async function init(){
   rebuild();setup();
   if(prevVisit){const n=jobs.filter(j=>!j.noise&&!j.blocked&&isUnseen(j)).length;
     if(n){$('#welcome').innerHTML=`👋 ברוך שובך! נוספו <b>${n}</b> משרות חדשות מאז הביקור הקודם (${ago(prevVisit)}). <button class="btn sm" id="showSince">הצג רק אותן</button>`;$('#welcome').classList.remove('hide')}}
-  else{$('#welcome').innerHTML='👋 ברוך הבא! כדאי להתחיל בלשונית <b>⚙️ הפרופיל שלי</b> ולהוסיף כישורים, ערים ותחומים, כדי שהמשרות ימוינו לפי ההתאמה אליך.';$('#welcome').classList.remove('hide')}
+  else{$('#welcome').innerHTML='👋 ברוך הבא! כדאי להתחיל בלשונית <b>⚙️ הפרופיל שלי</b> ולבחור את <b>שנות הניסיון</b> שלך ולהוסיף כישורים, מיקומים ותחומים, כדי שהמשרות ימוינו לפי ההתאמה אליך.';$('#welcome').classList.remove('hide')}
   st.lastVisit=Date.now();save();
   renderAll();
 }
 function setup(){
   const fill=(sel,arr)=>{const el=$(sel);const cur=el.value;el.length=1;arr.forEach(v=>el.add(new Option(v,v)));el.value=cur};
   fill('#fCompany',[...new Set(jobs.map(j=>j.company))].sort((a,b)=>a.localeCompare(b)));
-  fill('#fCity',[...new Set(jobs.map(j=>j.city))].sort());
+  const cnt={};jobs.filter(j=>!j.noise).forEach(j=>{cnt[j.city]=(cnt[j.city]||0)+1;if(j.region&&j.region!==j.city)cnt[j.region]=(cnt[j.region]||0)+1});
+  $('#placeList').innerHTML=REGIONS.map(r=>`<option value="${esc(r)}">אזור${cnt[r]?' · '+cnt[r]+' משרות':''}</option>`).join('')+CITY_DATA.filter(c=>!REGIONS.includes(c[0])).map(([c,r])=>`<option value="${esc(c)}">${esc(r)}${cnt[c]?' · '+cnt[c]+' משרות':''}</option>`).join('');
+  $('#yoeBadge').textContent=yoeLabel();
   fill('#cCat',[...new Set(companies.map(c=>c.category))].sort());
-  fill('#cityIn',CITIES.map(c=>c[0]).filter(c=>c!=='חו"ל'));
+
   $('#aSt').innerHTML=STATUSES.filter(s=>s.k!=='dismissed').map(s=>`<option value="${s.k}">${s.e} ${s.l}</option>`).join('');$('#aSt').value='saved';
   const last=jobs.filter(j=>!j.custom).reduce((m,j)=>j.date>m?j.date:m,new Date(0));
   $('#lastUpdate').textContent=+last?'הסריקה האחרונה: '+fmtDate(last):'';
@@ -457,18 +496,18 @@ function setup(){
 let fStatus='active',fRole='';
 function visibleBase(){return jobs.filter(j=>($('#fNoise').checked||!j.noise)&&!j.blocked)}
 function filtered(){
-  const q=$('#q').value.trim().toLowerCase(),co=$('#fCompany').value,city=$('#fCity').value,dv=$('#fDate').value,myc=$('#fMyCities').checked;
+  const q=$('#q').value.trim().toLowerCase(),co=$('#fCompany').value,city=$('#fCity').value.trim(),dv=$('#fDate').value,myc=$('#fMyCities').checked;
   let r=visibleBase().filter(j=>{
     const s=stOf(j);
     if(fStatus==='active'&&(s==='dismissed'||s==='rejected'))return false;
     if(fStatus!=='active'&&fStatus!=='all'&&s!==fStatus)return false;
     if(fRole&&!j.roles.includes(fRole)&&!(fRole==='אחר'&&!j.roles.length))return false;
     if(co&&j.company!==co)return false;
-    if(city&&j.city!==city)return false;
-    if(myc&&st.profile.cities.length&&!st.profile.cities.includes(j.city))return false;
+    if(city&&!placeMatch(j,city)&&!(j.city+' '+j.region).includes(city))return false;
+    if(myc&&st.profile.cities.length&&!inMyPlaces(j))return false;
     if(dv==='since'&&!isUnseen(j))return false;
     if(dv&&dv!=='since'&&Date.now()-j.date>+dv*DAY)return false;
-    if(q){const o=st.jobs[j.id]||{};if(!(j.title+' '+j.company+' '+j.roles.join(' ')+' '+j.city+' '+(o.n||'')+' '+(o.contact||'')).toLowerCase().includes(q))return false}
+    if(q){const o=st.jobs[j.id]||{};if(!(j.title+' '+j.company+' '+j.roles.join(' ')+' '+j.city+' '+j.region+' '+(o.n||'')+' '+(o.contact||'')).toLowerCase().includes(q))return false}
     return true;
   });
   const so=$('#fSort').value,pr=j=>(st.jobs[j.id]||{}).p||0;
@@ -505,7 +544,7 @@ const stars=p=>[1,2,3].map(i=>`<span data-p="${i}">${i<=p?'★':'☆'}</span>`).
 function card(j){
   const o=st.jobs[j.id]||{},s=stOf(j),ref=refMap[j.company.toLowerCase()];
   return`<article class="card ${j.noise?'noise':''} ${isUnseen(j)?'unseen':''}" data-id="${j.id}">
-    <div class="meta"><b style="color:var(--text)">${esc(j.company)}</b>${st.favs[j.company]?'⭐':''}<span>· ${esc(j.city)}</span><span class="sp"></span>
+    <div class="meta"><b style="color:var(--text)">${esc(j.company)}</b>${st.favs[j.company]?'⭐':''}<span title="${esc(j.region)}">· ${esc(j.city)}</span><span class="sp"></span>
       ${isUnseen(j)?'<span class="tag t-new">חדש מאז הביקור</span>':isFresh(j)?'<span class="tag t-new">חדש!</span>':''}${j.custom?'<span class="tag">נוספה ידנית</span>':''}<span title="${fmtDate(j.date)}">${ago(j.date)}</span></div>
     <h3 data-a="open" dir="auto">${esc(j.title)}</h3>
     <div class="meta"><span class="match ${matchCls(j.score)}" title="${esc(j.why.join(' · ')||'הוסף כישורים בפרופיל לשיפור הדיוק')}">התאמה ${j.score}%</span>
@@ -687,16 +726,25 @@ $('#tplReset').onclick=()=>{if(confirm('לאפס את כל התבניות לבר
 
 /* ---------- PROFILE ---------- */
 function renderProfile(){
-  const p=st.profile;$('#pName').value=p.name;$('#pGoal').value=p.goal;$('#pFollow').value=p.follow;
+  const p=st.profile;$('#pName').value=p.name;
+  const yi=YOE_OPTS.findIndex(([a,b])=>a===p.yoeMin&&b===p.yoeMax);
+  $('#pYoe').innerHTML=YOE_OPTS.map((o,i)=>`<option value="${i}">${o[2]}</option>`).join('')+(yi<0?'<option value="" selected>טווח מותאם</option>':'');if(yi>=0)$('#pYoe').value=yi;
+  $('#pYoeMin').value=p.yoeMin;$('#pYoeMax').value=p.yoeMax;$('#pGoal').value=p.goal;$('#pFollow').value=p.follow;
   const tags=(el,arr,key)=>$(el).innerHTML=arr.map((x,i)=>`<span data-k="${key}" data-i="${i}" title="הסרה">${esc(x)} ✕</span>`).join('')||'<small style="color:var(--muted)">עדיין ריק</small>';
   tags('#skillsTags',p.skills,'skills');tags('#cityTags',p.cities,'cities');tags('#blockTags',p.block,'block');
   $('#roleTags').innerHTML=ROLES.map(r=>`<button class="chip ${p.roles.includes(r[0])?'on':''}" data-role="${esc(r[0])}">${esc(r[0])}</button>`).join('');
 }
-function profChanged(){save();scoreAll();renderProfile()}
+function profChanged(){save();scoreAll();renderProfile();$('#yoeBadge').textContent=yoeLabel()}
 document.querySelectorAll('.tagsin').forEach(el=>el.addEventListener('click',e=>{const s=e.target.closest('[data-k]');if(s){st.profile[s.dataset.k].splice(+s.dataset.i,1);profChanged()}}));
 function tagInput(sel,key){$(sel).addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===','){e.preventDefault();e.target.value.split(',').map(v=>v.trim()).filter(Boolean).forEach(v=>{if(!st.profile[key].some(x=>x.toLowerCase()===v.toLowerCase()))st.profile[key].push(v)});e.target.value='';profChanged()}})}
 tagInput('#skillIn','skills');tagInput('#blockIn','block');
-$('#cityIn').onchange=e=>{const v=e.target.value;if(v&&!st.profile.cities.includes(v))st.profile.cities.push(v);e.target.value='';profChanged()};
+const ALL_PLACES=[...REGIONS,...CITY_DATA.map(c=>c[0]).filter(c=>!REGIONS.includes(c))];
+function addPlace(v){v=v.trim();if(!v)return;const known=ALL_PLACES.find(x=>x===v)||ALL_PLACES.find(x=>x.includes(v));
+  if(!known){toast('לא מצאתי את המיקום הזה ברשימה');return}if(!st.profile.cities.includes(known))st.profile.cities.push(known);$('#cityIn').value='';profChanged()}
+$('#cityIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addPlace(e.target.value)}});
+$('#cityIn').addEventListener('change',e=>{if(ALL_PLACES.includes(e.target.value.trim()))addPlace(e.target.value)});
+$('#pYoe').onchange=e=>{if(e.target.value==='')return;const[a,b]=YOE_OPTS[+e.target.value];st.profile.yoeMin=a;st.profile.yoeMax=b;profChanged();setup()};
+['#pYoeMin','#pYoeMax'].forEach(s=>$(s).addEventListener('change',()=>{const a=Math.max(0,+$('#pYoeMin').value||0),b=Math.max(a,+$('#pYoeMax').value||a);st.profile.yoeMin=a;st.profile.yoeMax=b;profChanged();setup()}));
 $('#roleTags').onclick=e=>{const b=e.target.closest('[data-role]');if(!b)return;const r=b.dataset.role,a=st.profile.roles;a.includes(r)?a.splice(a.indexOf(r),1):a.push(r);profChanged()};
 $('#pName').oninput=e=>{st.profile.name=e.target.value;save()};
 $('#pGoal').oninput=e=>{st.profile.goal=Math.max(1,+e.target.value||10);save()};
